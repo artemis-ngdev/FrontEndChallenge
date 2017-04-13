@@ -1,0 +1,15 @@
+{
+  "name": "Udemy-Javascript",
+  "version": "1.0.0",
+  "main": "path/to/main.css",
+  "ignore": [
+    ".jshintrc",
+    "**/*.txt"
+  ],
+  "dependencies": {
+    "owl.carousel": "^2.2.1",
+    "angular-ui-carousel": "^0.1.7",
+    "AngularJS-Toaster": "angularjs-toaster#^2.1.0"
+  },
+  "devDependencies": {}
+}

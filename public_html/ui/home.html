@@ -1,0 +1,29 @@
+  <div>
+	  <form ng-submit="doNothing()" name="homeForm" class="form-horizontal"  novalidate     >
+	  
+	  <input type='email' name='emailName' ng-model='email'  /> 
+	  <span ng-show="homeForm.$submitted  && homeForm.emailName.$error.email"> you have error in the email input</span>
+	  <input type="submit"/>  
+	  
+	   you are in home.html
+  		 	<table class="table table-hover">
+ 			 <th> Car type</th>
+			 
+			 <th> Date bought</th>
+			  
+			 <th> Details</th>
+
+			 <tbody>
+				 <tr ng-repeat="car in cars"> 
+				 <td ng-style="{{car}} "> {{car.type}}  </td>
+				 <td> {{car.dateBought }}  </td>
+				 <td><button class="btn btn-danger btn-xs" 
+							  ui-sref="{{car.state}}({carId : car.carId})"
+							  > click me!!</button> </td>
+				 </tr>
+			 </tbody> 
+		   </table>
+	  </form>
+ 
+</div>
+<div ui-view></div>
