@@ -80,7 +80,7 @@ app.controller("postsController", ['UserService', '$stateParams', '$scope', '$ui
 		$scope.loadPost = function (Id) {
 			$state.go('root.post', {mode: 'edit', "Id": Id});
 		};
-		 
+
 	}]);
 
 app.controller("postEditController", ['UserService', '$window', '$stateParams', '$scope', '$q', 'toaster', '$state', '$rootScope',
@@ -111,50 +111,49 @@ app.controller("postEditController", ['UserService', '$window', '$stateParams', 
 			$scope.showCommentReplySection = false;
 			$scope.editRecord = {};
 		}
- 
+
 		var promisesForComments = [];
-		$scope.submitComment = function () { 
+		$scope.submitComment = function () {
 			$scope.comment.postId = parseInt($stateParams.Id);
 			promisesForComments.push(UserService.query1("posts", parseInt($stateParams.Id), "comments"));
 			promisesForComments.push(UserService.save1("posts", parseInt($stateParams.Id), "comments", $scope.comment));
 			$q.all(promisesForComments).then(function (res) {
 				if (res) {
-					$scope.comments = res[0]; 
+					$scope.comments = res[0];
 					var last = res[res.length - 1];
-					$scope.comments.push(last); 
+					$scope.comments.push(last);
 					clearCommentSection();
-					 
 				}
 			});
 		};
-		
-		$scope.$on("AfterSuccessFullSave", function (ev, args) { 
+
+		$scope.$on("AfterSuccessFullSave", function (ev, args) {
 			if (args.name === "posts") {
-				 /* because the new record  isn't actually "saved" into a DB
+				/* because the new record  isn't actually "saved" into a DB
 				 * and because upon loading the list (state :' root.postsList') 
 				 * the $scope.posts gets populated again with the GET call
 				 * the ui (the array) remains the same
-				 */ 
+				 */
 				$state.go('root.postsList');
 			}
 		});
-		
+
 	}]);
 
-app.controller("albumController", ['UserService', '$stateParams', '$scope','$state',
+app.controller("albumController", ['UserService', '$stateParams', '$scope', '$state',
 	function (UserService, $stateParams, $scope, $state) {
 
 		UserService.query1("users", parseInt($stateParams.userId), "albums").then(function (response) {
 			$scope.albums = response;
-		}); 
+		});
 
 	}]);
 
-app.controller("albumEditController", ['$scope', '$q','$state','$stateParams','UserService', function ($scope,$q,$state,$stateParams,UserService) {
-		var albumPromises = []; 
+app.controller("albumEditController", ['$scope', '$q', '$state', '$stateParams', 'UserService', function ($scope, $q, $state, $stateParams, UserService) {
+		var albumPromises = [];
 		if ($stateParams.albumId) {
 			$scope.submitAlbum = false;
-			$scope.albumTitle =  "Album Details";
+			$scope.albumTitle = "Album Details";
 			albumPromises.push(UserService.getById("albums", parseInt($stateParams.albumId)));
 			albumPromises.push(UserService.query1("albums", parseInt($stateParams.albumId), "photos"));
 			$q.all(albumPromises).then(function (results) {
@@ -162,53 +161,39 @@ app.controller("albumEditController", ['$scope', '$q','$state','$stateParams','U
 					$scope.editRecord = results[0];
 					$scope.photos = results[1];
 				}
-			}); 
-		} else{
+			});
+		} else {
 			$scope.submitAlbum = true;
-			$scope.albumTitle =  "New Album";
+			$scope.albumTitle = "New Album";
 			$scope.editRecord = {};
 		}
-		 
-		 $scope.$on("AfterSuccessFullSave", function (ev, args) { 
+
+		$scope.$on("AfterSuccessFullSave", function (ev, args) {
 			if (args.name === "albums") {
-				 /* because the new record  isn't actually "saved" into a DB
+				/* because the new record  isn't actually "saved" into a DB
 				 * and because upon loading the list (state :' root.albumsList') 
 				 * the $scope.photos gets populated again with the GET call
 				 * the ui (the array) remains the same
-				 */ 
+				 */
 				$state.go('root.albumsList');
 			}
 		});
-		 
-		$scope.remove = function (ind) {
-			var $carousel = $(".owl-carousel");
-			$carousel.trigger('remove.owl.carousel', ind);
-		}
 
-	}]).directive("owlCarousel", function () {
-	return {
-		restrict: 'E',
-		transclude: false,
-		link: function (scope) {
-			scope.initCarousel = function (element) {
-				var defaultOptions = {loop: false, margin: 50, nav: false,
-					navigation: true, pagination: false, rewindNav: false,
-					dots: true, responsive: {0: {items: 1}, 600: {items: 3}, 1000: {items: 5}
-					}};
-				$(element).owlCarousel(defaultOptions);
-
-			};
-
-		}
-	};
-}).directive('owlCarouselItem', [function () {
-		return {
-			restrict: 'A',
-			transclude: false,
-			link: function (scope, element) {
-				if (scope.$last) {
-					scope.initCarousel(element.parent());
+		var promisesForPhotos = [];
+		$scope.submitPhoto = function () {
+			if (!$scope.AlbumsForm.$error.hasOwnProperty('url')) { 
+			$scope.photo.albumId = parseInt($stateParams.albumId);
+			$scope.photo.thumbnailUrl = $scope.photo.url;
+			promisesForPhotos.push(UserService.query1("albums", parseInt($stateParams.albumId), "photos"));
+			promisesForPhotos.push(UserService.save1("albums", parseInt($stateParams.albumId), "photos", $scope.photo));
+			$q.all(promisesForPhotos).then(function (res) {
+				if (res) {
+					$scope.photos = res[0];
+					var last = res[res.length - 1];
+					$scope.photos.push(last);
+					$scope.photo = {};
 				}
+			});
 			}
 		};
 	}]);
@@ -239,23 +224,23 @@ app.controller("todoController", ['UserService', '$state', '$rootScope', 'toaste
 				if (result === false) {
 					$rootScope.modalInstance.close();
 				}
-			}; 
+			};
 		};
-		 
+
 
 	}]);
 
-app.controller("todoEditController", ['$rootScope','$scope','UserService','$stateParams', function ($rootScope,$scope,UserService,$stateParams) {
+app.controller("todoEditController", ['$rootScope', '$scope', 'UserService', '$stateParams', function ($rootScope, $scope, UserService, $stateParams) {
 		$scope.status = [{"statusId": 1, "completed": true},
-						 {"statusId": 2, "completed": false}, ];
-					 
-		 $scope.$on("AfterSuccessFullSave", function (ev, args) {
-			if (args.name === "todos") { 
-					$scope.todos.push(args.editRecord);
- 					$rootScope.modalInstance.close();
-				}
-			});
-  		
+			{"statusId": 2, "completed": false}, ];
+
+		$scope.$on("AfterSuccessFullSave", function (ev, args) {
+			if (args.name === "todos") {
+				$scope.todos.push(args.editRecord);
+				$rootScope.modalInstance.close();
+			}
+		});
+
 	}]);
 
    

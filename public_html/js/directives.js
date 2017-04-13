@@ -19,8 +19,20 @@ app.directive('buttonDelete', ['CONSTANTS', '$uibModal', '$filter', 'toaster', f
 			scope: {
 				pk: '@',
 				name: "@",
-				array: "="
+				array: "=",
+				icon:"@",
+				type:"@"
 			},
+			compile: function (element, attr) {
+				if (angular.isDefined(attr.icon) === false) {
+					attr.icon = 'glyphicon glyphicon-trash';
+					attr.type = 'btn btn-danger btn-xs';
+				} else {
+					attr.icon = 'glyphicon glyphicon-remove';
+					attr.type = 'btn btn-link btn-xs';
+				}
+			},	 
+			replace: true,				
 			templateUrl: CONSTANTS.BASE_URL + 'ui/buttonDelete.html',
 			controller: function ($scope, UserService, $filter, toaster) {
 
@@ -68,8 +80,7 @@ app.directive('buttonSave', ['CONSTANTS', 'toaster', '$rootScope', function (CON
 					 
 				$scope.saveRecord = function () {
 					$scope.$parent.editRecord.userId = parseInt($stateParams.userId);
-					UserService.save($scope.name, $scope.editRecord).then(function (response) {
-						console.log(response);
+					UserService.save($scope.name, $scope.editRecord).then(function (response) { 
 						if (response.$resolved) {
 							 toaster.pop('success', "Successful saving of record", "Your item has been saved");
 							 
